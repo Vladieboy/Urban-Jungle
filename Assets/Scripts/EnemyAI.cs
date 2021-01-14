@@ -6,27 +6,39 @@ using UnityEngine.AI;
 
 public class EnemyAI : MonoBehaviour
 {
-    [SerializeField] float chaseRange = 5f;
-    [SerializeField] float turnSpeed = 5f;
 
+    public enum EnemyStatus
+    {
+        Default,
+        Alert,
+        Provked
+    }
+
+
+    [SerializeField, Range(0f, 10f)] float chaseRange = 5f;
+    [SerializeField] float turnSpeed = 5f;
+    public bool IsPlayerHiding = false;
 
     NavMeshAgent navMeshAgent;
-    
+
 
     ThirdPersonMovement character;
 
+    public int EnemyAlertPhase;
 
     float distanceToTarget = Mathf.Infinity;
-   public bool isProvoked = false;
-   public bool isMovingBack = false;
+    public bool isProvoked = false;
+    public bool isMovingBack = false;
 
     public bool IsProvoked() { return isProvoked; }
 
     // Start is called before the first frame update
     void Start()
     {
+        EnemyAlertPhase = (int)EnemyStatus.Default;
+
         navMeshAgent = GetComponent<NavMeshAgent>();
-        
+
         character = FindObjectOfType<ThirdPersonMovement>();
     }
 
@@ -40,50 +52,48 @@ public class EnemyAI : MonoBehaviour
         if (isMovingBack)
         {
             var dist = Vector3.Distance(GetComponent<EnemyPatrol>().IntialPos(), transform.position);
-        print(dist);
+
             if (dist <= .2)
             {
                 navMeshAgent.ResetPath();
                 isMovingBack = false;
             }
         }
-        
+
         distanceToTarget = Vector3.Distance(character.transform.position, transform.position);
         if (isProvoked)
         {
             //Attack
             EngageTarget();
-        } 
+        }
         else if (distanceToTarget <= chaseRange)
         {
             isProvoked = true;
             isMovingBack = true;
-        } 
+        }
         else if (!isProvoked && isMovingBack)
         {
             //if enemy has lost player, return to starting positions
-            
+
             navMeshAgent.SetDestination(GetComponent<EnemyPatrol>().IntialPos());
-            
-            //if (transform.position == GetComponent<EnemyPatrol>().IntialPos())
-            //{
-            //    print("hit");
-            //    navMeshAgent.ResetPath();
-            //}
-           
-            //GetComponent<EnemyPatrol>().StopAllCoroutines();
+
+
         }
     }
 
-    private void UpdateChaseRange()
+    public void UpdateChaseRange()
     {
+
         if (character.IsSneaking())
         {
-            chaseRange = 2f;
-        } else
-        {
-            chaseRange = 5f;
+            chaseRange = 3f;
         }
+        else
+        {
+            chaseRange = 6f;
+        }
+
+        if (IsPlayerHiding) chaseRange -= 2f;
     }
 
     void FaceTarget()
@@ -97,13 +107,13 @@ public class EnemyAI : MonoBehaviour
     private void EngageTarget()
     {
         FaceTarget();
-        
+
         if (distanceToTarget >= navMeshAgent.stoppingDistance)
         {
 
             ChaseTarget();
 
-        } 
+        }
         else if (distanceToTarget <= navMeshAgent.stoppingDistance)
         {
             AttackTarget();
@@ -117,14 +127,14 @@ public class EnemyAI : MonoBehaviour
 
     private void ChaseTarget()
     {
-        
+
         navMeshAgent.SetDestination(character.transform.position);
     }
 
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, chaseRange);
-        
+
     }
 }
