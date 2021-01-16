@@ -87,15 +87,10 @@ public class EnemyPatrol : MonoBehaviour
 
         isWaiting = true;
         print("starting to wait");
-        yield return new WaitForSeconds(4);
+        yield return new WaitForSeconds(3);
         print("done");
         isWaiting = false;
     }
 
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(transform.position, 10f);
 
-    }
 }

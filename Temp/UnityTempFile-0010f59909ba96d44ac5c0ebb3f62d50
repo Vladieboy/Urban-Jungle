@@ -302,3 +302,4 @@ Assets\Scripts\EnemySpawner.cs
 Assets\Scripts\FPSCounter.cs
 Assets\Scripts\PlayerHidingSpot.cs
 Assets\Scripts\ThirdPersonMovement.cs
+Assets\Scripts\Timer.cs

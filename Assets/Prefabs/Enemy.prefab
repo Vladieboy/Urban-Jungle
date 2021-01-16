@@ -108,6 +108,7 @@ GameObject:
   - component: {fileID: 8028517700579497803}
   - component: {fileID: 8028517700579497804}
   - component: {fileID: 779682678986166358}
+  - component: {fileID: 8208871951638984397}
   m_Layer: 0
   m_Name: Enemy
   m_TagString: Untagged
@@ -202,9 +203,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85e731acb68bfd34d8b67c78402cea67, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  chaseRange: 5
+  EnemyAlertPhase: 0
+  timeUntilGiveUp: 2
+  enemyFOV: 60
+  aggroRange: 5
   turnSpeed: 5
-  isProvoked: 0
+  IsPlayerHiding: 0
   isMovingBack: 0
 --- !u!195 &8028517700579497804
 NavMeshAgent:
@@ -243,3 +247,17 @@ MonoBehaviour:
   enemyRange: 3
   initialPos: {x: 0, y: 0, z: 0}
   isWaiting: 0
+--- !u!114 &8208871951638984397
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8028517700579497777}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68fc4002d2a117d49b6e485c26b90848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  timeRemaining: 10
+  timerIsRunning: 0
