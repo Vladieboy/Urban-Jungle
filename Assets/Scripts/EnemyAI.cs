@@ -31,6 +31,7 @@ public class EnemyAI : MonoBehaviour
     Timer timer;
 
     ThirdPersonMovement character;
+    Animator anim;
 
 
     float distanceToTarget = Mathf.Infinity;
@@ -45,7 +46,8 @@ public class EnemyAI : MonoBehaviour
         EnemyAlertPhase = (int)EnemyStatus.Default;
         timer = GetComponent<Timer>();
         navMeshAgent = GetComponent<NavMeshAgent>();
-        
+        anim = GetComponent<Animator>();
+
         character = FindObjectOfType<ThirdPersonMovement>();
     }
 
@@ -59,55 +61,70 @@ public class EnemyAI : MonoBehaviour
         UpdateChaseRange();
 
         bool _isPlayerSighted = PlayerSighted();
+        bool _shouldEngage = ShouldEngageTarget();
 
-        if (!_isPlayerSighted && EnemyAlertPhase == EnemyStatus.Reseting)
+        if (_isPlayerSighted) FaceTarget();
+
+        switch (EnemyAlertPhase)
         {
-            var dist = Vector3.Distance(GetComponent<EnemyPatrol>().IntialPos(), transform.position);
-            print(dist);
-            if (dist <= 2)
-            {
-                navMeshAgent.ResetPath();
-                timer.ResetTimer();
-                EnemyAlertPhase = EnemyStatus.Default;
-                
-            }
-            else navMeshAgent.SetDestination(GetComponent<EnemyPatrol>().IntialPos());
+            case EnemyStatus.Default:
+                if (!_isPlayerSighted) timer.StopTimer();
+                else EnemyAlertPhase = EnemyStatus.Provoked;
+                break;
+            case EnemyStatus.Alert:
 
+                if (_isPlayerSighted)
+                {
+
+                }
+                else if (_isPlayerSighted && timer.timeRemaining == 0)
+                {
+                    EnemyAlertPhase = EnemyStatus.Reseting;
+                    navMeshAgent.SetDestination(GetComponent<EnemyPatrol>().IntialPos());
+                }
+
+                break;
+            case EnemyStatus.Reseting:
+                if (_isPlayerSighted)
+                {
+                    EnemyAlertPhase = EnemyStatus.Provoked;
+                }
+                else
+                {
+
+                    var dist = Vector3.Distance(GetComponent<EnemyPatrol>().IntialPos(), transform.position);
+
+                    if (dist <= 2)
+                    {
+                        navMeshAgent.ResetPath();
+                        timer.ResetTimer();
+                        EnemyAlertPhase = EnemyStatus.Default;
+
+                    }
+                    else navMeshAgent.SetDestination(GetComponent<EnemyPatrol>().IntialPos());
+                }
+                break;
+            case EnemyStatus.Provoked:
+                if (_isPlayerSighted) timer.ResetTimer();
+                else if (!_isPlayerSighted && timer.timeRemaining == 0)
+                {
+                    EnemyAlertPhase = EnemyStatus.Alert;
+                    timer.StartTimer();
+                }
+                else if (!_isPlayerSighted) timer.timerIsRunning = true;
+                EngageTarget();
+                break;
+            case EnemyStatus.Attacking:
+
+                //if player is in range, attack
+                //else set status to provoked
+                if (_isPlayerSighted) AttackTarget();
+                else if (!_isPlayerSighted) EnemyAlertPhase = EnemyStatus.Provoked;
+                break;
+            default:
+                break;
         }
 
-        if (!_isPlayerSighted && EnemyAlertPhase == EnemyStatus.Provoked && timer.timeRemaining == 0)
-        {
-            EnemyAlertPhase = EnemyStatus.Alert;
-            timer.StartTimer();
-        }
-
-        if (!_isPlayerSighted && EnemyAlertPhase == EnemyStatus.Alert && timer.timeRemaining == 0)
-        {
-            print("give up");
-
-
-            EnemyAlertPhase = EnemyStatus.Reseting;
-            navMeshAgent.SetDestination(GetComponent<EnemyPatrol>().IntialPos());
-        }
-
-        if (_isPlayerSighted && EnemyAlertPhase == EnemyStatus.Default)
-        {
-            EnemyAlertPhase = EnemyStatus.Provoked;
-        }
-        else if (_isPlayerSighted && (EnemyAlertPhase == EnemyStatus.Provoked || EnemyAlertPhase == EnemyStatus.Attacking))
-        {
-            timer.ResetTimer();
-            EngageTarget();
-        }
-        else if (!_isPlayerSighted && (EnemyAlertPhase == EnemyStatus.Provoked || EnemyAlertPhase == EnemyStatus.Attacking))
-        {
-
-            EngageTarget();
-            timer.timerIsRunning = true;
-        } else if (!_isPlayerSighted && EnemyAlertPhase == EnemyStatus.Default)
-        {
-            timer.StopTimer();
-        }
 
     }
 
@@ -123,12 +140,17 @@ public class EnemyAI : MonoBehaviour
 
             RaycastHit hit;
 
+
+            //increase range on aggro
             if (Physics.Raycast(transform.position + transform.up, direction.normalized, out hit, aggroRange))
             {
 
-                if (character.CompareTag(hit.collider.gameObject.tag))
-                {
 
+
+                //if (character.CompareTag(hit.collider.gameObject.tag))
+                if (character.tag == "Player")
+                {
+                    anim.SetTrigger("bark");
 
                     _isSighted = true;
                 }
@@ -179,50 +201,59 @@ public class EnemyAI : MonoBehaviour
     private void EngageTarget()
     {
 
-
-
-
-  
-
-
         FaceTarget();
-
-
-
         if (distanceToTarget >= navMeshAgent.stoppingDistance)
         {
             timer.StopTimer();
-            
+
             ChaseTarget();
 
         }
         else if (distanceToTarget <= navMeshAgent.stoppingDistance)
         {
             EnemyAlertPhase = EnemyStatus.Attacking;
-            if (timer.timeRemaining == 0)
-            {
-                AttackTarget();
-                timer.ResetTimer();
-                timer.StartTimer();
-            } else
-            {
 
-                timer.StartTimer();
-            }
+            //if (timer.timeRemaining == 0)
+            //{
+            //    AttackTarget();
+            //    timer.ResetTimer();
+            //    timer.StartTimer();
+            //}
+            //else
+            //{
+
+            //    timer.StartTimer();
+            //}
 
 
         }
     }
-
-    private void AttackTarget()
+    private bool ShouldEngageTarget()
     {
+        distanceToTarget = Vector3.Distance(character.transform.position, transform.position);
+        var _shouldEngage = false;
+        if (distanceToTarget <= navMeshAgent.stoppingDistance)
+        {
+            _shouldEngage = true;
+
+
+        }
+        return _shouldEngage;
+    }
+
+    public void AttackTarget()
+    {
+        //anim.SetBool("attack", true);
         character.GetComponent<PlayerHealth>().TakeDamage(20);
     }
 
     private void ChaseTarget()
     {
+        anim.ResetTrigger("bark");
+        anim.SetBool("run", true);
         if (EnemyAlertPhase == EnemyStatus.Attacking)
         {
+
             EnemyAlertPhase = EnemyStatus.Provoked;
             timer.StartTimer();
         }

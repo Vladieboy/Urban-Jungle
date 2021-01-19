@@ -20,6 +20,7 @@ public class PlayerHealth : MonoBehaviour
     private void KillPlayer()
     {
         GetComponent<DeathHandler>().HandleDealth();
+        GetComponent<Animator>().SetBool("die", true);
         print("SNAKE!!!!!");
     }
 }
