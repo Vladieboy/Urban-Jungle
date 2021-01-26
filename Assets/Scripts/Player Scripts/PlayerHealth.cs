@@ -6,11 +6,19 @@ using UnityEngine;
 public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] public float hitPoints = 100;
+    [SerializeField] public float maxHitPoints = 100;
 
+    public SliderScript slider;
 
+    public void Start()
+    {
+        
+        slider.SetMaxValue(hitPoints);
+    }
     public void TakeDamage(float damage)
     {
-        hitPoints -= damage;
+        
+        slider.SetValue(hitPoints, hitPoints -= damage);
         if (hitPoints <= 0)
         {
             KillPlayer();

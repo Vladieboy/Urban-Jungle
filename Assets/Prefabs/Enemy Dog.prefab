@@ -51,7 +51,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 0
+  m_StoppingDistance: 1
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
@@ -72,7 +72,7 @@ CapsuleCollider:
   m_Radius: 0.4779088
   m_Height: 0.9558176
   m_Direction: 1
-  m_Center: {x: 2.9052122e-11, y: -0.12139422, z: -0.0053074956}
+  m_Center: {x: 0, y: 0.45790476, z: -0.0053074956}
 --- !u!95 &2512695524507936781
 Animator:
   serializedVersion: 3
@@ -83,7 +83,7 @@ Animator:
   m_GameObject: {fileID: 8028517700579497777}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: e823545ae8f018640b924cf1493a8bed, type: 3}
-  m_Controller: {fileID: 9100000, guid: e2331815f0855224f8e6eeb82ed86d42, type: 2}
+  m_Controller: {fileID: 0}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -138,7 +138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68fc4002d2a117d49b6e485c26b90848, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeRemaining: 10
+  timeRemaining: 5
   timerIsRunning: 0
 --- !u!1001 &8641037108664972930
 PrefabInstance:
@@ -161,7 +161,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 400052, guid: 7579ac2528e22114faaf3c5191eebed1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -0.578
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 400052, guid: 7579ac2528e22114faaf3c5191eebed1, type: 3}
       propertyPath: m_LocalPosition.z

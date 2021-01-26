@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyPatrol : MonoBehaviour
+public class NPCPatrol : MonoBehaviour
 {
     [SerializeField] float enemyRange = 3f;
     private float latestDirectionChangeTime;
@@ -41,10 +41,10 @@ public class EnemyPatrol : MonoBehaviour
             
             //move enemy: 
             var newPos = new Vector3(transform.position.x + (movementPerSecond.x * Time.deltaTime),
-            transform.position.y, transform.position.z + (movementPerSecond.z * Time.deltaTime));  
+            0f, transform.position.z + (movementPerSecond.z * Time.deltaTime));
             //var newPos = new Vector3(transform.position.x + (movementPerSecond.x * Time.deltaTime),
             //transform.position.y + (movementPerSecond.y * Time.deltaTime), transform.position.z + (movementPerSecond.z * Time.deltaTime));
-
+            
             var distance = Vector3.Distance(initialPos, newPos);
             
             if (distance > enemyRange)
